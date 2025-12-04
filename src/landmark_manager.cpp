@@ -42,8 +42,28 @@ bool LandmarkManager::loadFromCSV(const std::string& csv_path) {
     
     while (std::getline(file, line)) {
         ++line_num;
-        
+
         if (line.empty() || line[0] == '#') {
+            continue;
+        }
+        
+        std::istringstream iss(line);
+        std::string token;
+        std::vector<std::string> tokens;
+        
+        while (std::getline(iss, token, ',')) {
+            tokens.push_back(token);
+        }
+        
+        try {
+            int id = std::stoi(tokens[0]);
+            double x = std::stod(tokens[1]);
+            double y = std::stod(tokens[2]);
+            
+            landmarks_[id] = {x, y};
+        } catch (const std::exception& e) {
+            std::cerr << "Warning: Failed to parse line " << line_num 
+                      << ": " << line << " (" << e.what() << ")" << std::endl;
             continue;
         }
     }
@@ -55,7 +75,6 @@ bool LandmarkManager::loadFromCSV(const std::string& csv_path) {
         return false;
     }
     
-    std::cout << "Loaded " << landmarks_.size() << " landmarks from " << csv_path << std::endl;
     return true;
 }
 

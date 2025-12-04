@@ -13,6 +13,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 # Include directories
 include_directories(include)
@@ -20,15 +21,8 @@ include_directories(include)
 # Main node executable
 add_executable(positioning_node
   src/positioning_node.cpp
-)
-
-target_link_libraries(positioning_node
-  ${rclcpp_LIBRARIES}
-  ${nav_msgs_LIBRARIES}
-  ${sensor_msgs_LIBRARIES}
-  ${geometry_msgs_LIBRARIES}
-  ${tf2_LIBRARIES}
-  ${tf2_geometry_msgs_LIBRARIES}
+  src/ukf.cpp
+  src/landmark_manager.cpp
 )
 
 ament_target_dependencies(positioning_node
@@ -38,6 +32,10 @@ ament_target_dependencies(positioning_node
   geometry_msgs
   tf2
   tf2_geometry_msgs
+)
+
+target_link_libraries(positioning_node
+  Eigen3::Eigen
 )
 
 # Install targets
@@ -56,8 +54,8 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/launch
 )
 
-install(FILES
-  landmarks.csv
+install(DIRECTORY
+  data/
   DESTINATION share/${PROJECT_NAME}
 )
 
